@@ -9,6 +9,8 @@ import { styled } from 'nativewind';
 import { useNavigation } from '@react-navigation/native';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../config/firebase';
+import { useDispatch, useSelector } from 'react-redux';
+import { setUserLoading } from '../redux/user';
 //import Snackbar from 'react-native-snackbar';
 
 //pour les style car les classe makhdmuch bla mander hka 
@@ -24,6 +26,8 @@ const StyledTextInput=styled(TextInput)
 const MyComponent = () => { 
     const [email , setEmail]= useState('');
     const [password , setPassword] = useState('');
+    const {userLoading} = useSelector(state => state.user);
+    const dispatch = useDispatch();
 
     const navigation = useNavigation();
     
@@ -32,11 +36,20 @@ const MyComponent = () => {
         if (email && password ){
             //navigation.goBack(); 
             //navigation.navigate('Home');
-            await createUserWithEmailAndPassword (auth , email , password);
-
+            try{
+                dispatch(setUserLoading(true));
+                await createUserWithEmailAndPassword (auth , email , password);
+                dispatch(setUserLoading(false));
+            }catch(e){
+                dispatch(setUserLoading(false));
+                Snackbar.show({
+                    text : e.message,
+                    backgroundColor : 'red'
+                })
+            }
         }else{
             Snackbar.show({
-                text: 'Hello world',
+                text: 'Email and Password are required!',
                 backgroundColor : 'red'
               });
         }
@@ -67,17 +80,15 @@ const MyComponent = () => {
           
           <StyledView>
               {
-                 /* userLoading? (
+                  userLoading? (
                       <Loading />
                   ):(
                       <StyledTouchableOpacity onPress={handleSubmit} style={{backgroundColor: colors.button}} className="my-6 rounded-full p-3 shadow-sm mx-2">
                           <StyledText className="text-center text-white text-lg font-bold">Sign Up</StyledText>
                       </StyledTouchableOpacity>
-                  )*/
+                  )
               }
-              <StyledTouchableOpacity onPress={handleSubmit} style={{backgroundColor: colors.button}} className="my-6 rounded-full p-3 shadow-sm mx-2">
-                          <StyledText className="text-center text-white text-lg font-bold">Sign Up</StyledText>
-                 </StyledTouchableOpacity>
+              
           </StyledView>
         </StyledView>
       </ScreenWrapper>

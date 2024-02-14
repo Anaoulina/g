@@ -9,6 +9,9 @@ import { styled } from 'nativewind';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../config/firebase';
 import { useNavigation } from '@react-navigation/native';
+import { useDispatch, useSelector } from 'react-redux';
+import { setUserLoading } from '../redux/user';
+
 
 
 
@@ -23,14 +26,28 @@ const StyledTextInput=styled(TextInput)
 const MyComponent = () => {
     const [email , setEmail]= useState('');
     const [password , setPassword] = useState('');
+    const {userLoading} = useSelector(state => state.user);
 
     const navigation = useNavigation();
+
+    const dispatch = useDispatch();
 
     const handleSubmit = async () =>{
         if (email && password){
             //navigation.goback();
             //navigation.navigate('Home');
-            await signInWithEmailAndPassword(auth , email , password ); 
+            try{
+                dispatch(setUserLoading(true));
+                await signInWithEmailAndPassword(auth , email , password );
+                dispatch(setUserLoading(false));
+            }catch(e){
+                dispatch(setUserLoading(false));
+                Snackbar.show({
+                    text : e.message, 
+                    backgroundColor : 'red'
+                })
+            }
+             
         }
         else {
             Snackbar.show({
@@ -66,17 +83,17 @@ const MyComponent = () => {
         </StyledView>
         
         <StyledView>
-            {   /*
+            {  
                 userLoading? (
                     <Loading />
                 ):(
-                    
-                    
-                )*/
-            }
-            <StyledTouchableOpacity onPress={handleSubmit} style={{backgroundColor: colors.button}} className="my-6 rounded-full p-3 shadow-sm mx-2">
+                    <StyledTouchableOpacity onPress={handleSubmit} style={{backgroundColor: colors.button}} className="my-6 rounded-full p-3 shadow-sm mx-2">
                         <StyledText className="text-center text-white text-lg font-bold">Sign In</StyledText>
                     </StyledTouchableOpacity>
+                    
+                ) 
+                
+            }
         </StyledView>
       </StyledView>
        </ScreenWrapper>
