@@ -1,11 +1,16 @@
 //import liraries
-import React, { Component } from 'react';
+import React, { Component , useState  } from 'react';
 import { View, Text, StyleSheet,  Image, TextInput, TouchableOpacity } from 'react-native';
 import ScreenWrapper from '../components/screenWrapper';
 import BackButton from '../components/backButton';
 import Loading from '../components/loading';
 import { colors } from '../theme';
 import { styled } from 'nativewind';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { auth } from '../config/firebase';
+import { useNavigation } from '@react-navigation/native';
+
+
 
 const StyledView = styled(View)
 const StyledText = styled(Text)
@@ -16,6 +21,25 @@ const StyledTextInput=styled(TextInput)
 
 // create a component
 const MyComponent = () => {
+    const [email , setEmail]= useState('');
+    const [password , setPassword] = useState('');
+
+    const navigation = useNavigation();
+
+    const handleSubmit = async () =>{
+        if (email && password){
+            //navigation.goback();
+            //navigation.navigate('Home');
+            await signInWithEmailAndPassword(auth , email , password ); 
+        }
+        else {
+            Snackbar.show({
+                text: 'Email and password are required !!',
+                backgroundColor : 'red'
+              });
+        }
+    }
+
     return (
        <ScreenWrapper>
           <StyledView className="flex justify-between h-full mx-4 ">
@@ -32,9 +56,9 @@ const MyComponent = () => {
             </StyledView>
             <StyledView className="space-y-2 mx-2">
                 <StyledText className={`${colors.heading} text-lg font-bold`}>Email</StyledText>
-                <StyledTextInput /*value={email} onChangeText={value=> setEmail(value)}*/ className="p-4 bg-white rounded-full mb-3" />
+                <StyledTextInput value={email} onChangeText={value=> setEmail(value)} className="p-4 bg-white rounded-full mb-3" />
                 <StyledText  className={`${colors.heading} text-lg font-bold`}>Password</StyledText>
-                <StyledTextInput /*value={password} secureTextEntry onChangeText={value=> setPassword(value)}*/ className="p-4 bg-white rounded-full mb-3" />
+                <StyledTextInput value={password} secureTextEntry onChangeText={value=> setPassword(value)} className="p-4 bg-white rounded-full mb-3" />
                 <StyledTouchableOpacity className="flex-row justify-end">
                     <StyledText>Forget Password?</StyledText>
                 </StyledTouchableOpacity>
@@ -50,7 +74,7 @@ const MyComponent = () => {
                     
                 )*/
             }
-            <StyledTouchableOpacity /*onPress={handleSubmit}*/ style={{backgroundColor: colors.button}} className="my-6 rounded-full p-3 shadow-sm mx-2">
+            <StyledTouchableOpacity onPress={handleSubmit} style={{backgroundColor: colors.button}} className="my-6 rounded-full p-3 shadow-sm mx-2">
                         <StyledText className="text-center text-white text-lg font-bold">Sign In</StyledText>
                     </StyledTouchableOpacity>
         </StyledView>

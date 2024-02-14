@@ -4,6 +4,9 @@ import { View, Text, TouchableOpacity,StyleSheet ,Image } from 'react-native';
 import ScreenWrapper from '../components/screenWrapper';
 import { styled } from 'nativewind';
 import { colors } from '../theme'
+import { signOut } from 'firebase/auth';
+import { auth } from '../config/firebase';
+import { useNavigation } from '@react-navigation/native';
 
 const StyledView = styled(View)
 const StyledText = styled(Text)
@@ -12,11 +15,17 @@ const StyledImage = styled(Image)
 
 // create a component
 const MyComponent = () => {
+
+    const navigation = useNavigation();
+
+    const handleLogout = async ()=>{
+        await signOut(auth);
+    }
     return (
         <ScreenWrapper  >
             <StyledView className="flex-row justify-between items-center p-4"> 
                 <StyledText className="text-gray-700 font-bold text-3xl shadow-sm " >PiggyBank</StyledText>
-                <StyledTouchableOpacity className="bg-red-200 rounded-3xl p-4">
+                <StyledTouchableOpacity onPress={handleLogout} className="bg-red-200 rounded-3xl p-4">
                 <Text className="text-gray-700 ">Logout</Text>
             </StyledTouchableOpacity>
             </StyledView>
